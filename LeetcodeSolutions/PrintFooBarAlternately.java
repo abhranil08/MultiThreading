@@ -44,6 +44,48 @@ class PrintFooBarAlternately {
     }
 }
 
+//Semaphore solution
+/*
+The FooBar class contains:
+
+An integer n which denotes the number of times foo and bar should be printed.
+Two semaphores:
+foo initialized with 1 permit, allowing the foo method to run first.
+bar initialized with 0 permits, blocking the bar method until a permit is released by foo.
+
+Explanation of Synchronization :
+
+Initially, the foo semaphore has 1 permit, and the bar semaphore has 0 permits. This allows the foo method to execute first.
+After foo prints "foo", it releases a permit to the bar semaphore, allowing the bar method to run.
+The bar method prints "bar" and then releases a permit to the foo semaphore, allowing the foo method to run again.
+This alternating pattern continues for n iterations, ensuring that "foo" and "bar" are printed in an alternating sequence.
+*/
+class FooBar {
+    private final int n;
+    private final Semaphore foo = new Semaphore(1);
+    private final Semaphore bar = new Semaphore(0);
+
+    public FooBar(int n) {
+        this.n = n;
+    }
+
+    public void foo(Runnable printFoo) throws InterruptedException {
+        for (int i = 0; i < n; i++) {
+            foo.acquire();
+        	printFoo.run();
+            bar.release();
+        }
+    }
+
+    public void bar(Runnable printBar) throws InterruptedException {
+        for (int i = 0; i < n; i++) {
+            bar.acquire();
+        	printBar.run();
+            foo.release();
+        }
+    }
+}
+
 /*
 Question - Suppose you are given the following code:
 
