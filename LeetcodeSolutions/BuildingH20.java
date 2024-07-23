@@ -37,6 +37,58 @@ class BuildingH20 {
     }
 }
 
+//Semaphore solution
+/*
+In the constructor:
+The hydrogen semaphore is initialized with 2 permits, allowing up to two hydrogen atoms to be released before it blocks further hydrogen atoms.
+The oxygen semaphore is initialized with 0 permits, initially blocking the release of oxygen atoms.
+
+The hydrogen method:
+
+Acquires a permit from the hydrogen semaphore. If no permits are available, the method will block until a permit becomes available.
+Runs the releaseHydrogen.run() method, which outputs "H".
+Checks if both hydrogen permits have been used (hydrogen.availablePermits() == 0). 
+If true, it releases one permit to the oxygen semaphore, allowing the oxygen method to run.
+
+The oxygen method:
+
+Acquires a permit from the oxygen semaphore. If no permits are available, the method will block until a permit becomes available.
+Runs the releaseOxygen.run() method, which outputs "O".
+Releases two permits to the hydrogen semaphore, allowing two hydrogen atoms to be released.
+
+Explanation of Synchronization
+Initially, the hydrogen semaphore allows up to two hydrogen atoms to be released because it starts with 2 permits.
+After two hydrogen atoms are released, the oxygen semaphore is given a permit, allowing one oxygen atom to be released.
+Once the oxygen atom is released, the hydrogen semaphore is reset with 2 permits, allowing the process to repeat.
+
+*/
+class H2O_II {
+
+    private final Semaphore hydrogen;
+    private final Semaphore oxygen;
+
+    public H2O() {
+        hydrogen = new Semaphore(2);
+        oxygen = new Semaphore(0);
+    }
+
+    public void hydrogen(Runnable releaseHydrogen) throws InterruptedException {
+        hydrogen.acquire();
+        // releaseHydrogen.run() outputs "H". Do not change or remove this line.
+        releaseHydrogen.run();
+
+        if(hydrogen.availablePermits()==0)  oxygen.release(1);
+    }
+
+    public void oxygen(Runnable releaseOxygen) throws InterruptedException {
+        oxygen.acquire();
+        // releaseOxygen.run() outputs "O". Do not change or remove this line.
+        releaseOxygen.run();
+
+        hydrogen.release(2);
+    }
+}
+
 /*
 Question - 1117. Building H2O
 Medium
